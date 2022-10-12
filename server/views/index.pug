@@ -1,0 +1,17 @@
+extends layout
+
+block content
+	h1= title
+	p
+		| 
+	p: a(href="/rasp/start") Расписание
+	p
+		|
+	p Welcome, #[em= user.name], to the excellent #{title}
+	p: q Это внешние кавычки #[q а это внутренние] внешние продолжаются
+	article 
+		h2 Sessions
+		p Counter: #{counter}
+
+	footer
+		a(href='/logout', style='text-underline-offset: 1px') Выход

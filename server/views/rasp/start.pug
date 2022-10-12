@@ -1,0 +1,67 @@
+extends ../layout
+
+block content
+	h1 Расписание
+
+	pre= JSON.stringify(query, null, 4)
+
+	form(method='get') 
+		input(type='date', name='date', value=dateFrom.toISOString().slice(0, 10))
+
+		p: select(name='idp')
+			each prep in Object.entries(rasp.SPPREP).map(([_, value]) => value).sort((a, b) => a.FAMIO < b.FAMIO ? -1 : a.FAMIO > b.FAMIO ? 1 : 0)
+				if idp === prep.IDP
+					option(value=prep.IDP, selected)= prep.FAMIO
+				else
+					option(value=prep.IDP)= prep.FAMIO
+
+		p: button(type='submit') Отправить
+
+	section 
+		table(border=1, style='width: 100%')
+			thead 
+				tr
+					th(rowspan='2', style='width: 3ch') #
+					th(colspan='2') Занятие
+				tr 
+					th(style='width: 50%') Подгруппа 1
+					th(style='width: 50%') Подгруппа 2
+			tbody(style='font-family: Arial Narrow, sans-serif') 
+				each classObj, idx in classes[0].classes
+					tr
+						<!-- !{JSON.stringify(classObj)} -->
+						td= idx + 1
+
+						if !classObj
+							td(colspan='2')
+
+						else
+							if classObj.subGroup === 0
+								td(colspan='2', style='text-align: center') 
+									span(style='padding: 0 0.5ch; display: block; float: left')= classObj.group
+									|
+									span(style='padding: 0 0.5ch')= classObj.discipline
+									|
+									span(style='padding: 0 0.5ch; display: block; float: right')= classObj.room
+
+							else if classObj.subGroup === 1
+								td 
+									span(style='padding: 0 0.5ch; display: block; float: left')= classObj.group
+									|
+									span(style='padding: 0 0.5ch')= classObj.discipline
+									|
+									span(style='padding: 0 0.5ch; display: block; float: right')= classObj.room
+								td
+
+							else
+								td
+								td 
+									span(style='padding: 0 0.5ch; display: block; float: left')= classObj.group
+									|
+									span(style='padding: 0 0.5ch')= classObj.discipline
+									|
+									span(style='padding: 0 0.5ch; display: block; float: right')= classObj.room
+
+	section
+		//- pre= JSON.stringify(rasp.UROKI.slice(0, 10), null, 4)
+		pre(style='font-family: monospace; line-height: 1')= stringTable
