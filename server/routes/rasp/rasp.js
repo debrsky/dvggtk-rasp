@@ -5,13 +5,10 @@ const {table} = require('table');
 
 const {rasp} = require('../../lib/rasp/db');
 
-/* GET users listing. */
 router.get('/', function (req, res, next) {
 	const {query} = req;
 
-	const idp = parseInt(query.idp);
-	const idg = parseInt(query.idg);
-	const ida = parseInt(query.ida);
+	const teacher = query.teacher;
 
 	const dateFrom = (() => {
 		const d = new Date(Date.parse(query.date));
@@ -22,7 +19,7 @@ router.get('/', function (req, res, next) {
 	const dateTo = new Date(dateFrom);
 	dateTo.setDate(dateTo.getDate() + 2);
 
-	const classes = rasp.getClassesByTeacher(dateFrom, dateTo, idp);
+	const classes = rasp.getClassesByTeacher(dateFrom, dateTo, teacher);
 
 	// console.log(classes[0].classes);
 
@@ -56,7 +53,7 @@ router.get('/', function (req, res, next) {
 		classes,
 		dateFrom,
 		dateTo,
-		idp,
+		teacher,
 		stringTable: table(data, tableConfig)
 	});
 });

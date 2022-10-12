@@ -8,12 +8,9 @@ block content
 	form(method='get') 
 		input(type='date', name='date', value=dateFrom.toISOString().slice(0, 10))
 
-		p: select(name='idp')
-			each prep in Object.entries(rasp.SPPREP).map(([_, value]) => value).sort((a, b) => a.FAMIO < b.FAMIO ? -1 : a.FAMIO > b.FAMIO ? 1 : 0)
-				if idp === prep.IDP
-					option(value=prep.IDP, selected)= prep.FAMIO
-				else
-					option(value=prep.IDP)= prep.FAMIO
+		p: select(name='teacher')
+			each t in rasp.teachers.sort()
+				option(selected=t === teacher)= t
 
 		p: button(type='submit') Отправить
 
