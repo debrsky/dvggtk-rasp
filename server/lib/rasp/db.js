@@ -21,46 +21,77 @@ const tables = [
 
 const db = Object.fromEntries(tables.map((table) => [table[0], null]));
 
+function compareSp(a, b) {
+	if (a.name < b.name) return -1;
+	if (a.name > b.name) return 1;
+	return 0;
+}
+
+const spMetaData = {
+	teachers: {table: 'SPPREP', idField: 'IDP', nameField: 'FAMIO'},
+	groups: {table: 'SPGRUP', idField: 'IDG', nameField: 'NAIM'},
+	rooms: {table: 'SPKAUD', idField: 'IDA', nameField: 'KAUDI'}
+};
+
 const rasp = {
+	data: {},
+	dataLastChecked: null,
+	cache: {},
+	hasNewData: function () {
+		const res = this.data !== this.dataLastChecked;
+		this.dataLastChecked = this.data;
+
+		return res;
+	},
+	getSp: function (sp) {
+		const {table, idField, nameField} = spMetaData[sp];
+		if ((!this.cache[sp] || this.hasNewData()) && this.data[table]) {
+			this.cache[sp] = Object.values(this.data[table])
+				.map((row) => ({
+					id: row[idField],
+					name: row[nameField]
+				}))
+				.sort(compareSp);
+		}
+
+		return this.cache[sp] ?? [];
+	},
+
 	get teachers() {
-		return Object.values(this.data.SPPREP).map((row) => row.FAMIO);
-	},
-	findId: function (table, name) {
-		const [, idField, nameField] = tables.find(
-			([probeTable]) => probeTable === table
-		);
-		if (!idField || !nameField) throw Error();
-
-		const foundRow = Object.values(this.data[table]).find(
-			(row) => row[nameField] === name
-		);
-		if (!foundRow) return null;
-
-		return foundRow[idField];
+		return this.getSp('teachers');
 	},
 
-	getClassesByTeacher: function (dateFrom, dateTo, teacher) {
-		const idp = this.findId('SPPREP', teacher);
-		const dFrom = new Date(dateFrom);
-		const dTo = new Date(dateTo);
-		if (!idp || isNaN(dFrom.getTime()) || isNaN(dTo.getTime()))
-			throw new Error(
-				`Wrong parameters: ${JSON.stringify({dateFrom, dateTo, teacher})}`
-			);
+	get groups() {
+		return this.getSp('groups');
+	},
 
-		console.log('idp', idp);
+	get rooms() {
+		return this.getSp('rooms');
+	},
 
-		const res = [];
+	getClasses: function (dateFrom, dateTo, {teacher, group, room}) {
+		const filters = [];
+		[
+			['teachers', teacher],
+			['groups', group],
+			['rooms', room]
+		].forEach(([key, value]) => {
+			const {table, idField} = spMetaData[key];
+			const id = this.findId(table, value);
+			if (value) filters.push([idField, id]);
+		});
 
 		const uroki = this.data.UROKI.filter(
 			(row) =>
-				row.DAT.getTime() >= dFrom.getTime() &&
-				row.DAT.getTime() <= dTo.getTime() &&
-				row.IDP === idp
+				row.DAT.getTime() >= dateFrom.getTime() &&
+				row.DAT.getTime() <= dateTo.getTime() &&
+				filters.every(([idField, idValue]) => row[idField] === idValue)
 		);
 
-		let date = new Date(dFrom);
-		while (date.getTime() <= dTo.getTime()) {
+		const res = [];
+
+		let date = new Date(dateFrom);
+		while (date.getTime() <= dateTo.getTime()) {
 			const urokiByDay = uroki.filter(
 				(row) => row.DAT.getTime() === date.getTime()
 			);
@@ -77,33 +108,37 @@ const rasp = {
 			date = new Date(date.getTime() + 24 * 60 * 60 * 1000); // next date
 		}
 
-		// const res = Array.from(Array(8), (_, k) => k + 1);
-
 		return res;
 	},
-	getClassesByGroup: function (dateFrom, dateTo, idg) {},
-	getClassesByRoom: function (dateFrom, dateTo, ida) {}
+
+	findId: function (table, name) {
+		const [, idField, nameField] = tables.find(
+			([probeTable]) => probeTable === table
+		);
+		if (!idField || !nameField) throw Error();
+
+		const foundRow = Object.values(this.data[table]).find(
+			(row) => row[nameField] === name
+		);
+		if (!foundRow) return null;
+
+		return foundRow[idField];
+	}
 };
 
 function getClass(uroki) {
 	if (!(uroki?.length > 0)) return null;
 
-	const res = {};
-	const urok = uroki[0];
+	const res = uroki.map((urok) => ({
+		room: rasp.data.SPKAUD[urok.IDA]?.KAUDI ?? null,
+		discipline: rasp.data.SPPRED[urok.IDD]?.NAIM ?? null,
+		teacher: rasp.data.SPPREP[urok.IDP]?.FAMIO ?? null,
+		group: rasp.data.SPGRUP[urok.IDG]?.NAIM ?? null,
+		subGroup: urok.IDGG
+		// ,src: urok
+	}));
 
-	res.room = rasp.data.SPKAUD[urok.IDA]?.KAUDI;
-	res.discipline = rasp.data.SPPRED[urok.IDD].NAIM;
-	res.teacher = rasp.data.SPPREP[urok.IDP].FAMIO;
-
-	if (uroki.length === 1) {
-		res.group = rasp.data.SPGRUP[urok.IDG].NAIM;
-		res.subGroup = urok.IDGG;
-		return res;
-	}
-
-	// Поток (т.е. несколько групп на одной паре)
-	res.group = uroki.map((urok) => rasp.data.SPGRUP[urok.IDG].NAIM).join(', ');
-	res.subGroup = 0;
+	if (uroki.length === 1) return res[0];
 
 	return res;
 }

@@ -1,0 +1,18 @@
+GET http://localhost:3000/rasp/api/teachers
+X-Requested-With: XMLHttpRequest
+
+###
+GET http://localhost:3000/rasp/api/groups
+X-Requested-With: XMLHttpRequest
+
+###
+GET http://localhost:3000/rasp/api/rooms
+X-Requested-With: XMLHttpRequest
+
+###
+GET http://localhost:3000/rasp/api/classes?dateFrom=2022-10-10&dateTo=2022-10-15&teacher=Константинопольский%20К.К.&group&room
+X-Requested-With: XMLHttpRequest
+
+###
+GET http://localhost:3000/rasp/api/classes?dateFrom=2022-10-10&dateTo=2022-10-15&teacher=Лавренко%20Н.Н.&group&room
+X-Requested-With: XMLHttpRequest

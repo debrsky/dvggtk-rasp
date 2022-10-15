@@ -1,0 +1,36 @@
+doctype html
+html(lang='ru')
+	head
+		meta(charset='UTF-8')
+		meta(name='viewport', content='width=device-width, initial-scale=1.0')
+		title Расписание занятий. ДВГГТК
+		style.
+			.control {
+				padding: 0.3em;
+			}
+	body 
+		header
+		main 
+			section
+				form(name='filter') 
+					.control 
+						input#date(
+							type='date',
+							name='date',
+							value=new Date().toISOString().slice(0, 10)
+						)
+					.control
+						select#group(name='group')
+							option(value='') <группа>
+					.control
+						select#teacher(name='teacher')
+							option(value='') <преподаватель>
+					.control
+						select#room(name='room')
+							option(value='') <аудитория>
+
+			section#timetable 
+
+		footer
+
+		script(src='js/index.js') 

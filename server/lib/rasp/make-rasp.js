@@ -1,7 +1,7 @@
 function makeRasp(tables, db, rasp) {
 	const uroki = tables[0][0];
 	rasp.data = {};
-	rasp.data[uroki] = db[uroki];
+	rasp.data[uroki] = db[uroki].filter((row) => row.IDR === 0);
 
 	const sps = tables.slice(1);
 	const usedIds = {};

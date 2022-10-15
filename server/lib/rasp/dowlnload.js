@@ -54,7 +54,6 @@ function parseCsv(csv) {
 }
 
 async function saveToFile(table, {csv, headers}) {
-	console.log('saveToFile');
 	try {
 		await Promise.all([
 			fs.promises.writeFile(path.join(RASP_STORAGE, `${table}.csv`), csv),

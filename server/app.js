@@ -8,11 +8,12 @@ const logger = require('morgan');
 const responseTime = require('response-time');
 
 const sessions = require('./lib/sessions');
-const {setAuthorize, isLoggedIn} = require('./lib/auth.js');
+const {setAuthorize} = require('./lib/auth.js');
 
-const indexRouter = require('./routes/index');
+// const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const raspRouter = require('./routes/rasp/rasp');
+const raspApiRouter = require('./routes/rasp/api/index.js');
 
 const app = express();
 app.use(responseTime());
@@ -39,11 +40,12 @@ setAuthorize(app);
 
 app.use(express.static(config.public));
 
-app.use(isLoggedIn);
+// app.use(isLoggedIn);
 
-app.use('/', indexRouter);
+// app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/rasp', raspRouter);
+app.use('/rasp/api', raspApiRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -52,7 +54,7 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-	if (!err.status) console.error();
+	if (!err.status) console.error(err);
 
 	// set locals, only providing error in development
 	res.locals.message = err.message;
@@ -61,7 +63,10 @@ app.use(function (err, req, res, next) {
 	// render the error page
 	res.status(err.status || 500);
 
-	if (req.xhr) return res.send(err.message);
+	if (req.xhr) {
+		res.append('Content-Type', 'text/plain');
+		return res.send(err.message);
+	}
 
 	res.render('error');
 });
