@@ -16,5 +16,5 @@ export default function serve() {
 	gulp.watch(`${SRC_DIR}/**/*.css`, css);
 	gulp.watch(`${SRC_DIR}/**/*.less`, less);
 	gulp.watch(`${SRC_DIR}/pages/*.pug`, pug2html);
-	gulp.watch(`${SRC_DIR}/js/*.{js,svelte}`, script);
+	gulp.watch(`${SRC_DIR}/js/**/*.{js,svelte,pug}`, script);
 }

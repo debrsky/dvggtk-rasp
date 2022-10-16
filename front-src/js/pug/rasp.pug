@@ -1,0 +1,107 @@
+<!-- !{JSON.stringify({teacher, group, room, date})}-->
+if teacher
+	each classesByDate in classes.classesByDate
+		table.rasp-table
+			caption #{new Date(classesByDate.date).toLocaleString('ru-RU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} #{teacher}
+			colgroup
+				col(span='1', style='width: 3ch')
+				col(span='1', style='width: 50%')
+				col(span='1', style='width: 50%')
+			tbody
+				each classByNumber, idx in classesByDate.classes 	
+					tr(class={empty: classByNumber === null}) 
+						<!-- !{JSON.stringify(classByNumber)} -->
+						td.number= idx + 1
+						if classByNumber
+							if (!Array.isArray(classByNumber))
+								if (classByNumber.subGroup === 0)
+									td.lesson(colspan='2')
+										span.group= classByNumber.group
+										|
+										span.discipline= classByNumber.discipline
+										|
+										span.room= classByNumber.room
+								else if (classByNumber.subGroup === 1)
+									td.lesson
+										span.group= classByNumber.group
+										|
+										span.discipline= classByNumber.discipline
+										|
+										span.room= classByNumber.room
+									td.lesson.empty
+
+								else if (classByNumber.subGroup >= 2)
+									td.lesson.empty
+									td.lesson
+										span.group= classByNumber.group
+										|
+										span.discipline= classByNumber.discipline
+										|
+										span.room= classByNumber.room
+							else
+								//- Это поток
+								td.lesson(colspan='2')
+									.group= classByNumber.map((el) => el.group).join(', ')
+									.discipline= classByNumber[0].discipline
+									.room= classByNumber[0].room
+						else
+							td.empty(colspan='2')
+
+if false && teacher
+	each classesByDate in classes.classesByDate
+		.date= classesByDate.date
+		each classByNumber, idx in classesByDate.classes 
+			.number(style='display: flex')
+				.class-number(style='flex: 0 0 3ch')= idx + 1
+				.lesson(style='flex: 1 0 20ch')
+					<!-- !{JSON.stringify(classByNumber)} -->
+					//- pre= JSON.stringify(classByNumber)
+					if (classByNumber)
+						if (!Array.isArray(classByNumber))
+							if (classByNumber.subGroup === 0)
+								.group= classByNumber.group
+								.discipline= classByNumber.discipline
+								.room= classByNumber.room
+							else if (classByNumber.subGroup === 1)
+								.subgroups(style='display: flex') 
+									.subgroup(style='flex: 1 1 0')
+										.group= classByNumber.group
+										.discipline= classByNumber.discipline
+										.room= classByNumber.room
+									.subgroup.empty(style='flex: 1 1 0')
+							else if (classByNumber.subGroup >= 2)
+								.subgroups(style='display: flex') 
+									.subgroup.empty(style='flex: 1 1 0')
+									.subgroup(style='flex: 1 1 0')
+										.group= classByNumber.group
+										.discipline= classByNumber.discipline
+										.room= classByNumber.room
+
+						else
+							//- Это поток
+							.group= classByNumber.map((el) => el.group).join(', ')
+							.discipline= classByNumber[0].discipline
+							.room= classByNumber[0].room
+
+					else
+						.empty
+
+else if false
+	table(border='1', style='border-collapse: collapse; overflow-x: auto')
+		thead 
+			tr 
+				td Ауд.
+				each cls in [1,2,3,4,5,6,7,8] 
+					td= cls
+		tbody 
+			each room in rooms
+				tr
+					td= room
+					each classesByNumber in classes.classesByDate[0].classes
+						if classesByNumber
+							td 
+								each cls in classesByNumber.filter((cls) => cls.room === room)
+									| #{cls.teacher}
+									| #{cls.group}
+						else
+							td

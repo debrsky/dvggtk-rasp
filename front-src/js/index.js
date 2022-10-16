@@ -1,4 +1,4 @@
-import rasp from '../pug/rasp.pug';
+import rasp from './pug/rasp.pug';
 
 (async () => {
 	const resArray = await Promise.allSettled(
@@ -34,21 +34,30 @@ import rasp from '../pug/rasp.pug';
 		});
 
 		const {origin} = window.location;
-		console.log(origin);
+
+		const dateFrom = filterForm.date.value;
+		const dateTo = new Date(
+			new Date(new Date(dateFrom).toDateString()).getTime() +
+				7 * 24 * 60 * 60 * 1000
+		)
+			.toISOString()
+			.slice(0, 10);
+
+		console.log({dateFrom, dateTo});
 
 		const url = new URL(`${origin}/rasp/api/classes`);
-		url.searchParams.set('dateFrom', filterForm.date.value);
-		url.searchParams.set('dateTo', filterForm.date.value);
+		url.searchParams.set('dateFrom', dateFrom);
+		url.searchParams.set('dateTo', dateTo);
 		url.searchParams.append(name, value);
 
 		const res = await fetch(url);
 		if (!res.ok) return;
 		const classes = await res.json();
 
-		console.log(classes);
-
-		if (name === 'date') {
-			timetableElement.innerHTML = rasp({rooms, classes});
+		if (['date', 'teacher'].includes(name)) {
+			const data = {[name]: value, rooms, classes};
+			console.log(data);
+			timetableElement.innerHTML = rasp(data);
 		}
 	});
 })();
