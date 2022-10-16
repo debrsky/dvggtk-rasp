@@ -6,7 +6,7 @@ const path = require('path');
 
 const Papa = require('papaparse');
 
-const URL_TEMPLATE = 'https://rasp.dvggtk.org/csv/{table}.csv';
+const URL_TEMPLATE = process.env.SRC_CSV_URL_TEMPLATE;
 const RASP_STORAGE = path.join(config.rootDir, config.storage, 'rasp/csv');
 
 async function download(db) {
