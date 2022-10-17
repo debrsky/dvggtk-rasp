@@ -1,5 +1,12 @@
 import rasp from './pug/rasp.pug';
 
+const today = (() => {
+	const today = new Date();
+	return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+})();
+
+document.forms.filter.date.setAttribute('value', today);
+
 (async () => {
 	const resArray = await Promise.allSettled(
 		['/rasp/api/groups', '/rasp/api/teachers', '/rasp/api/rooms'].map((url) =>

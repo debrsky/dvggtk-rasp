@@ -15,11 +15,7 @@ html(lang='ru')
 			section
 				form(name='filter') 
 					.control 
-						input#date(
-							type='date',
-							name='date',
-							value=new Date().toISOString().slice(0, 10)
-						)
+						input#date(type='date', name='date')
 					.control
 						select#group(name='group')
 							option(value='') <группа>

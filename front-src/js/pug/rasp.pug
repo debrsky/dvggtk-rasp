@@ -2,7 +2,10 @@
 if teacher
 	each classesByDate in classes.classesByDate
 		table.rasp-table
-			caption #{new Date(classesByDate.date).toLocaleString('ru-RU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} #{teacher}
+			caption 
+				span #{new Date(classesByDate.date).toLocaleString('ru-RU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+				| &#32;
+				span #{teacher}
 			colgroup
 				col(span='1', style='width: 3ch')
 				col(span='1', style='width: 50%')
@@ -17,9 +20,7 @@ if teacher
 								if (classByNumber.subGroup === 0)
 									td.lesson(colspan='2')
 										span.group= classByNumber.group
-										|
 										span.discipline= classByNumber.discipline
-										|
 										span.room= classByNumber.room
 								else if (classByNumber.subGroup === 1)
 									td.lesson
