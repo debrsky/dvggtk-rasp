@@ -10,10 +10,9 @@ html(lang='ru')
 				padding: 0.3em;
 			}
 	body 
-		header
 		main 
-			section
-				form(name='filter') 
+			section.header
+				form(name='filter', style='display: flex; flex-wrap: wrap') 
 					.control 
 						input#date(type='date', name='date')
 					.control
@@ -26,8 +25,10 @@ html(lang='ru')
 						select#room(name='room')
 							option(value='') <аудитория>
 
-			section#timetable 
+			section#timetable.main(
+				style='height: 700px; overflow: auto; width: max-content; max-width: 100%; padding: 1ch'
+			)
 
-		footer
+		footer.footer
 
 		script(src='js/index.js') 

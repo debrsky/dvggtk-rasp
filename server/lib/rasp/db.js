@@ -69,7 +69,7 @@ const rasp = {
 		return this.getSp('rooms');
 	},
 
-	getClasses: function (dateFrom, dateTo, {teacher, group, room}) {
+	getClassesByDate: function (dateFrom, dateTo, {teacher, group, room}) {
 		const filters = [];
 		[
 			['teachers', teacher],
@@ -88,7 +88,7 @@ const rasp = {
 				filters.every(([idField, idValue]) => row[idField] === idValue)
 		);
 
-		const res = [];
+		const classesByDate = {};
 
 		let date = new Date(dateFrom);
 		while (date.getTime() <= dateTo.getTime()) {
@@ -103,12 +103,13 @@ const rasp = {
 				return getClass(urokiByUr);
 			});
 
-			res.push({date: date.toISOString().slice(0, 10), classes});
+			const dateStr = date.toISOString().slice(0, 10);
+			classesByDate[dateStr] = classes;
 
 			date = new Date(date.getTime() + 24 * 60 * 60 * 1000); // next date
 		}
 
-		return res;
+		return classesByDate;
 	},
 
 	findId: function (table, name) {

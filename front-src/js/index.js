@@ -1,38 +1,73 @@
+import {loadEntities, loadClasses} from './lib/rasp-load.js';
 import rasp from './pug/rasp.pug';
 
-const today = (() => {
+const filterForm = document.forms.filter;
+const groupElement = document.getElementById('group');
+const teacherElement = document.getElementById('teacher');
+const roomElement = document.getElementById('room');
+const timetableContainerElement = document.getElementById('timetable');
+
+let period, groups, teachers, rooms;
+
+const observerOptions = {
+	root: timetableContainerElement,
+	rootMargin: '500px',
+	threshold: 0
+};
+
+const observer = new IntersectionObserver((entries, observer) => {
+	entries.forEach((entry) => {
+		if (entry.isIntersecting) {
+			const date = entry.target.dataset.date;
+
+			const params = Object.fromEntries(
+				['teacher', 'group', 'room'].map((key) => [key, filterForm[key].value])
+			);
+
+			(async () => {
+				const classes = await loadClasses(date, date, params);
+				const data = {
+					date,
+					teacher: filterForm.teacher.value,
+					group: filterForm.group.value,
+					room: filterForm.room.value,
+					teachers,
+					groups,
+					rooms,
+					classes: classes.classesByDate[date]
+				};
+				const dateRaspHTML = rasp(data);
+				const dateElement = timetableContainerElement.querySelector(
+					`[data-date="${date}"]`
+				);
+				dateElement.innerHTML = dateRaspHTML;
+				observer.unobserve(entry.target);
+			})();
+		}
+	});
+}, observerOptions);
+
+const workDate = (() => {
 	const today = new Date();
 	return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
 })();
 
-document.forms.filter.date.setAttribute('value', today);
+filterForm.date.setAttribute('value', workDate);
 
 (async () => {
-	const resArray = await Promise.allSettled(
-		['/rasp/api/groups', '/rasp/api/teachers', '/rasp/api/rooms'].map((url) =>
-			fetch(url)
-		)
-	);
-
-	const [groups, teachers, rooms] = await Promise.all(
-		resArray.map(({status, value}) => {
-			if (status !== 'fulfilled') return Promise.resolve([]);
-			const res = value;
-			if (!res.ok) return Promise.resolve([]);
-			return res.json();
-		})
-	);
-
-	const groupElement = document.getElementById('group');
-	const teacherElement = document.getElementById('teacher');
-	const roomElement = document.getElementById('room');
-	const timetableElement = document.getElementById('timetable');
+	[period, groups, teachers, rooms] = await loadEntities([
+		'period',
+		'groups',
+		'teachers',
+		'rooms'
+	]);
 
 	groups.forEach((group) => groupElement.add(new Option(group)));
 	teachers.forEach((teacher) => teacherElement.add(new Option(teacher)));
 	rooms.forEach((room) => roomElement.add(new Option(room)));
 
 	const filterForm = document.forms.filter;
+
 	filterForm.addEventListener('change', async (event) => {
 		const {name, value} = event.target;
 
@@ -40,31 +75,54 @@ document.forms.filter.date.setAttribute('value', today);
 			if (el.name !== name) el.value = '';
 		});
 
-		const {origin} = window.location;
-
-		const dateFrom = filterForm.date.value;
+		const dateFrom = new Date(
+			new Date(filterForm.date.value).getTime() - 7 * 24 * 60 * 60 * 1000 // 7 days before
+		)
+			.toISOString()
+			.slice(0, 10);
 		const dateTo = new Date(
-			new Date(new Date(dateFrom).toDateString()).getTime() +
-				7 * 24 * 60 * 60 * 1000
+			new Date(filterForm.date.value).getTime() + 6 * 24 * 60 * 60 * 1000 // 6 days after
 		)
 			.toISOString()
 			.slice(0, 10);
 
-		console.log({dateFrom, dateTo});
+		const classes = await loadClasses(dateFrom, dateTo, {[name]: value});
 
-		const url = new URL(`${origin}/rasp/api/classes`);
-		url.searchParams.set('dateFrom', dateFrom);
-		url.searchParams.set('dateTo', dateTo);
-		url.searchParams.append(name, value);
-
-		const res = await fetch(url);
-		if (!res.ok) return;
-		const classes = await res.json();
-
-		if (['date', 'teacher'].includes(name)) {
-			const data = {[name]: value, rooms, classes};
-			console.log(data);
-			timetableElement.innerHTML = rasp(data);
+		const dates = [];
+		let date = new Date(period.dateStart);
+		const lastDate = new Date(period.dateEnd);
+		while (date.getTime() <= lastDate.getTime()) {
+			dates.push(date.toISOString().slice(0, 10));
+			date = new Date(date.getTime() + 24 * 60 * 60 * 1000); // next date;
 		}
+
+		timetableContainerElement.innerHTML = '';
+		dates.forEach((date) => {
+			const data = {
+				date,
+				teacher: filterForm.teacher.value,
+				group: filterForm.group.value,
+				room: filterForm.room.value,
+				teachers,
+				groups,
+				rooms,
+				classes: classes.classesByDate[date]
+			};
+			const dateRaspHTML = rasp(data);
+			timetableContainerElement.insertAdjacentHTML('beforeend', dateRaspHTML);
+		});
+
+		const strDate = filterForm.date.value;
+		const dateElement = timetableContainerElement.querySelector(
+			`[data-date="${strDate}"]`
+		);
+
+		dateElement?.scrollIntoView();
+
+		timetableContainerElement
+			.querySelectorAll(`article.day-rasp[data-need-loading]`)
+			.forEach((el) => {
+				observer.observe(el);
+			});
 	});
 })();

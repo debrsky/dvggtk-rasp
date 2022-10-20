@@ -3,6 +3,15 @@ function makeRasp(tables, db, rasp) {
 	rasp.data = {};
 	rasp.data[uroki] = db[uroki].filter((row) => row.IDR === 0);
 
+	let dateStart = null;
+	let dateEnd = null;
+	rasp.data[uroki].forEach((row) => {
+		if (dateStart === null || dateStart > row.DAT) dateStart = row.DAT;
+		if (dateEnd === null || dateEnd < row.DAT) dateEnd = row.DAT;
+	});
+	rasp.dateStart = dateStart;
+	rasp.dateEnd = dateEnd;
+
 	const sps = tables.slice(1);
 	const usedIds = {};
 	sps.forEach(([sp]) => {
