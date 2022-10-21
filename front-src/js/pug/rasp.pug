@@ -5,19 +5,12 @@
 	//- console.log([subjectKey, subjectValue]);
 
 	function getRaspElements (subjectKey, raspRowCell) {
-		const left = {
-			teacher: raspRowCell?.group,
-			group: raspRowCell?.teacher,
-			room: raspRowCell?.group
-		}[subjectKey];
-
-		const right = {
-			teacher: raspRowCell?.room,
-			group: raspRowCell?.room,
-			room: raspRowCell?.teacher
-		}[subjectKey];
-
-		return [left, raspRowCell.discipline, right];
+		const c = raspRowCell;
+		return {
+			teacher: [c?.group, c?.discipline, c?.room],
+			group: [c?.teacher, c?.discipline, c?.room],
+			room: [c?.group, c?.discipline, c?.teacher]
+		}[subjectKey]
 	};
 
 
@@ -70,7 +63,7 @@ article.day-rasp(data-date=date, data-need-loading=!loaded)
 			caption.rasp-table-caption
 				span #{new Date(date).toLocaleString('ru-RU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
 				| &#32;
-				span #{teacher}
+				span(style='white-space: nowrap') #{subjectValue}
 			colgroup
 				col(span='1', style='width: 3ch')
 				col(span='1', style='width: 50%')
@@ -80,18 +73,18 @@ article.day-rasp(data-date=date, data-need-loading=!loaded)
 					tr.rasp-table-row
 						td= number
 						if number === 1
-							td(
-								rowspan='8',
-								colspan='2',
-								style='vertical-align: middle; text-align: center'
-							) Loading...
+							td.rasp-loading(rowspan='8', colspan='2') 
+								.loader-container(
+									style='width: 100%; height: 100%; display: flex; place-content: center; place-items: center'
+								)
+									.loader
 
 	else
 		table.rasp-table
 			caption.rasp-table-caption
 				span #{new Date(date).toLocaleString('ru-RU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
 				| &#32;
-				span #{subjectValue}
+				span(style='white-space: nowrap') #{subjectValue}
 			colgroup
 				col(span='1', style='width: 3ch')
 				col(span='1', style='width: 50%')
