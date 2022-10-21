@@ -124,6 +124,12 @@ filterForm.date.setAttribute('value', workDate);
 			};
 			const dateRaspHTML = rasp(data);
 			timetableElement.insertAdjacentHTML('beforeend', dateRaspHTML);
+			if (new Date(date).getDay() === 0) {
+				timetableElement.insertAdjacentHTML(
+					'beforeend',
+					`<div class="splitter"></div><article class="advertising">Advertising</article>`
+				);
+			}
 		});
 
 		const strDate = filterForm.date.value;
