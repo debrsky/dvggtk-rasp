@@ -5,12 +5,12 @@ const filterForm = document.forms.filter;
 const groupElement = document.getElementById('group');
 const teacherElement = document.getElementById('teacher');
 const roomElement = document.getElementById('room');
-const timetableContainerElement = document.getElementById('timetable');
+const timetableElement = document.getElementById('timetable');
 
 let period, groups, teachers, rooms;
 
 const observerOptions = {
-	root: timetableContainerElement,
+	root: timetableElement,
 	rootMargin: '500px',
 	threshold: 0
 };
@@ -37,10 +37,16 @@ const observer = new IntersectionObserver((entries, observer) => {
 					classes: classes.classesByDate[date]
 				};
 				const dateRaspHTML = rasp(data);
-				const dateElement = timetableContainerElement.querySelector(
+				const dateElement = timetableElement.querySelector(
 					`[data-date="${date}"]`
 				);
-				dateElement.innerHTML = dateRaspHTML;
+				dateElement.replaceWith(
+					...(() => {
+						const div = document.createElement('DIV');
+						div.innerHTML = dateRaspHTML;
+						return div.children;
+					})()
+				);
 				observer.unobserve(entry.target);
 			})();
 		}
@@ -71,6 +77,14 @@ filterForm.date.setAttribute('value', workDate);
 	filterForm.addEventListener('change', async (event) => {
 		const {name, value} = event.target;
 
+		if (name === 'date') {
+			const dateElement = timetableElement.querySelector(
+				`[data-date="${value}"]`
+			);
+			dateElement?.scrollIntoView();
+			return;
+		}
+
 		[groupElement, teacherElement, roomElement].forEach((el) => {
 			if (el.name !== name) el.value = '';
 		});
@@ -96,7 +110,7 @@ filterForm.date.setAttribute('value', workDate);
 			date = new Date(date.getTime() + 24 * 60 * 60 * 1000); // next date;
 		}
 
-		timetableContainerElement.innerHTML = '';
+		timetableElement.innerHTML = '';
 		dates.forEach((date) => {
 			const data = {
 				date,
@@ -109,20 +123,26 @@ filterForm.date.setAttribute('value', workDate);
 				classes: classes.classesByDate[date]
 			};
 			const dateRaspHTML = rasp(data);
-			timetableContainerElement.insertAdjacentHTML('beforeend', dateRaspHTML);
+			timetableElement.insertAdjacentHTML('beforeend', dateRaspHTML);
 		});
 
 		const strDate = filterForm.date.value;
-		const dateElement = timetableContainerElement.querySelector(
+		const dateElement = timetableElement.querySelector(
 			`[data-date="${strDate}"]`
 		);
 
 		dateElement?.scrollIntoView();
 
-		timetableContainerElement
+		timetableElement
 			.querySelectorAll(`article.day-rasp[data-need-loading]`)
 			.forEach((el) => {
 				observer.observe(el);
 			});
 	});
 })();
+
+// function setTimetableHeight() {
+// 	timetableElement.style.height = `${timetableContainerElement.clientHeight}px`;
+// }
+// setTimetableHeight();
+// window.addEventListener('resize', setTimetableHeight);

@@ -67,7 +67,7 @@ mixin raspRow(subjectKey, raspRowData)
 article.day-rasp(data-date=date, data-need-loading=!loaded)
 	if !loaded
 		table.rasp-table
-			caption(style='background-color: darkgrey; color: white') 
+			caption.rasp-table-caption
 				span #{new Date(date).toLocaleString('ru-RU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
 				| &#32;
 				span #{teacher}
@@ -77,7 +77,7 @@ article.day-rasp(data-date=date, data-need-loading=!loaded)
 				col(span='1', style='width: 50%')
 			tbody
 				each number in Array.from(Array(8), (_, idx) => idx + 1)
-					tr
+					tr.rasp-table-row
 						td= number
 						if number === 1
 							td(
@@ -88,7 +88,7 @@ article.day-rasp(data-date=date, data-need-loading=!loaded)
 
 	else
 		table.rasp-table
-			caption(style='background-color: darkgrey; color: white') 
+			caption.rasp-table-caption
 				span #{new Date(date).toLocaleString('ru-RU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
 				| &#32;
 				span #{subjectValue}
@@ -98,7 +98,7 @@ article.day-rasp(data-date=date, data-need-loading=!loaded)
 				col(span='1', style='width: 50%')
 			tbody
 				each classByNumber, idx in classes
-					tr(class={empty: classByNumber === null}) 
+					tr.rasp-table-row(class={empty: classByNumber === null}) 
 						<!-- !{JSON.stringify(classByNumber)} -->
 						td.number= idx + 1
 						if classByNumber

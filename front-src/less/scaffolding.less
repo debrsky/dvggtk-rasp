@@ -6,6 +6,7 @@
 
 :root {
 	box-sizing: border-box;
+	height: 100%;
 }
 
 img {
@@ -17,10 +18,10 @@ body {
 	margin: 0;
 	padding: 0;
 	font-family: Arial, Helvetica, sans-serif;
-}
-
-.main {
-	margin-top: 117px;
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+	min-height: 100%;
+	width: 100%;
 }
 
 .header {
@@ -28,9 +29,22 @@ body {
 	position: fixed;
 	top: 0;
 	left: 0;
-	height: 117px;
 	width: 100%;
 	background-color: beige;
+}
+
+.main {
+	background-color: lightslategrey;
+	width: 100%;
+}
+
+.footer {
+	height: 100px;
+	width: 100%;
+	background-color: lightgreen;
+	display: flex;
+	place-content: center;
+	place-items: center;
 }
 
 // input,

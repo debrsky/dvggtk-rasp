@@ -10,25 +10,24 @@ html(lang='ru')
 				padding: 0.3em;
 			}
 	body 
-		main 
-			section.header
-				form(name='filter', style='display: flex; flex-wrap: wrap') 
-					.control 
-						input#date(type='date', name='date')
-					.control
-						select#group(name='group')
-							option(value='') <группа>
-					.control
-						select#teacher(name='teacher')
-							option(value='') <преподаватель>
-					.control
-						select#room(name='room')
-							option(value='') <аудитория>
-
-			section#timetable.main(
-				style='height: 700px; overflow: auto; width: max-content; max-width: 100%; padding: 1ch'
+		header.header(style='position: sticky')
+			form(name='filter', style='display: flex; flex-wrap: wrap') 
+				.control 
+					input#date(type='date', name='date')
+				.control
+					select#group(name='group')
+						option(value='') <группа>
+				.control
+					select#teacher(name='teacher')
+						option(value='') <преподаватель>
+				.control
+					select#room(name='room')
+						option(value='') <аудитория>
+		main#timetable-container.main(style='position: relative')
+			section#timetable(
+				style='overflow-y: auto; position: absolute; top: 1ch; left: 1ch; right: 1ch; bottom: 1ch; width: max-content; max-width: calc(100% - 2 * 1ch)'
 			)
 
-		footer.footer
+		footer.footer advirtisement
 
 		script(src='js/index.js') 
