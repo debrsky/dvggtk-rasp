@@ -2,6 +2,10 @@
 	"name": "dvggtk-rasp",
 	"version": "0.0.0",
 	"private": true,
+	"engines": {
+		"npm": "8.x",
+		"node": "16.x"
+	},
 	"scripts": {
 		"start": "node ./server/bin/www",
 		"dev-server": "nodemon ./server/bin/www",
