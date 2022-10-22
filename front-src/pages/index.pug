@@ -23,6 +23,12 @@ html(lang='ru')
 				.control
 					select#room(name='room')
 						option(value='') <аудитория>
+				.control
+					select#oneDay(name='oneDay')
+						option(value='') <один день>
+						option(value='groups') Группы
+						option(value='teachers') Преподаватели
+						option(value='rooms') Аудитории
 		main#timetable-container.main(style='position: relative')
 			section#timetable(
 				style='overflow-y: auto; position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; max-width: 100%'

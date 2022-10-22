@@ -11,6 +11,10 @@ function makeRasp(tables, db, rasp) {
 	});
 	rasp.dateStart = dateStart;
 	rasp.dateEnd = dateEnd;
+	rasp.maxUR = rasp.data[uroki].reduce(
+		(prev, cur) => (prev < cur.UR ? cur.UR : prev),
+		0
+	);
 
 	const sps = tables.slice(1);
 	const usedIds = {};
@@ -24,8 +28,9 @@ function makeRasp(tables, db, rasp) {
 		});
 	});
 
-	sps.forEach(([sp, idField]) => {
+	sps.forEach(([sp, idField, nameField]) => {
 		const data = db[sp];
+
 		if (data) {
 			rasp.data[sp] = data.reduce((prev, cur) => {
 				const idValue = cur[idField];

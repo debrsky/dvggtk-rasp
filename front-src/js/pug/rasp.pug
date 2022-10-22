@@ -1,8 +1,7 @@
 -
 	const loaded = Boolean(classes);
-	//- console.log({teacher, group, room});
 	const [subjectKey, subjectValue] = Object.entries({teacher, group, room}).find(([_, value]) => Boolean(value));
-	//- console.log([subjectKey, subjectValue]);
+	// console.log([subjectKey, subjectValue]);
 
 	function getRaspElements (subjectKey, raspRowCell) {
 		const c = raspRowCell;

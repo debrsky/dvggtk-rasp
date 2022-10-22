@@ -42,7 +42,19 @@ async function download(db) {
 }
 
 function parseCsv(csv) {
-	const db = Papa.parse(csv, {header: true, skipEmptyLines: true});
+	const fixCsv = csv.replace(
+		/;"([^\r\n;]+)"\r\n/g,
+		(match, p1, offset, string, groups) => {
+			return `;"${p1.replaceAll('"', '*')}"\r\n`;
+		}
+	);
+
+	const db = Papa.parse(fixCsv, {
+		delimiter: ';',
+		escapeChar: '',
+		header: true,
+		skipEmptyLines: true
+	});
 
 	db.data.forEach((el) => {
 		for (const key of Object.keys(el)) {

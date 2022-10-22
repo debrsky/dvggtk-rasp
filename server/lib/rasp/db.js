@@ -112,6 +112,35 @@ const rasp = {
 		return classesByDate;
 	},
 
+	getOneDayClasses: function (date, subject) {
+		if (!['groups', 'teachers', 'rooms'].includes(subject)) throw new Error();
+
+		const DAT = new Date(date);
+		const {table, idField, nameField} = spMetaData[subject];
+
+		const uroki = this.data.UROKI.filter(
+			(row) => row.DAT.getTime() === DAT.getTime()
+		);
+
+		const oneDayClasses = {};
+		Object.values(this.data[table]).forEach((spRow) => {
+			const urokiBySubject = uroki.filter(
+				(urokRow) => urokRow[idField] === spRow[idField]
+			);
+
+			const classes = CLASS_NUMBERS.map((n) => {
+				const urokiByUr = urokiBySubject.filter((row) => row.UR === n);
+				if (urokiByUr.length === 0) return null;
+
+				return getClass(urokiByUr);
+			});
+
+			oneDayClasses[spRow[nameField]] = classes;
+		});
+
+		return oneDayClasses;
+	},
+
 	findId: function (table, name) {
 		const [, idField, nameField] = tables.find(
 			([probeTable]) => probeTable === table

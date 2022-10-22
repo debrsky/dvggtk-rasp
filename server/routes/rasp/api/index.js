@@ -34,7 +34,7 @@ router.get('/rooms', (req, res, next) => {
 	res.json(rasp.rooms.map((el) => el.name));
 });
 
-router.get('/classes', (req, res, next) => {
+router.get('/classes/bydate', (req, res, next) => {
 	const query = req.query;
 
 	const dateFrom = getDateFrom(query.dateFrom);
@@ -55,6 +55,27 @@ router.get('/classes', (req, res, next) => {
 			group,
 			room
 		})
+	});
+});
+
+router.get('/classes/bysubject', (req, res, next) => {
+	const query = req.query;
+
+	const date = getDateFrom(query.date);
+
+	if (isNaN(date.getTime()))
+		return next(createError(400, `Wrong date: ${query.dateFrom}`));
+
+	const subject = query.subject;
+	if (!['groups', 'teachers', 'rooms'].includes(subject))
+		return next(createError(400, `Wrong subject: ${subject}`));
+
+	const classes = rasp.getOneDayClasses(date, subject);
+	// console.log(date, subject, JSON.stringify(classes));
+
+	res.json({
+		date: date.toISOString().slice(0, 10),
+		oneDayClasses: classes
 	});
 });
 
