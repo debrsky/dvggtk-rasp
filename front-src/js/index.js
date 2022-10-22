@@ -3,6 +3,7 @@ import {
 	loadClassesByDate,
 	loadClassesBySubject
 } from './lib/rasp-load.js';
+import rtb from './lib/yandex-rtb.js';
 import rasp from './pug/rasp.pug';
 
 const filterForm = document.forms.filter;
@@ -180,7 +181,7 @@ filterForm.date.setAttribute('value', workDate);
 				if (new Date(date).getDay() === 0) {
 					timetableElement.insertAdjacentHTML(
 						'beforeend',
-						`<div class="splitter"></div><article class="advertising">Advertising</article>`
+						`<div class="splitter"></div><article class="advertising">${rtb}</article>`
 					);
 				}
 			});
