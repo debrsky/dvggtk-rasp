@@ -3,7 +3,6 @@ import {
 	loadClassesByDate,
 	loadClassesBySubject
 } from './lib/rasp-load.js';
-import rtb from './lib/yandex-rtb.js';
 import rasp from './pug/rasp.pug';
 
 const filterForm = document.forms.filter;
@@ -164,6 +163,7 @@ filterForm.date.setAttribute('value', workDate);
 				date = new Date(date.getTime() + 24 * 60 * 60 * 1000); // next date;
 			}
 
+			let rtbPage = 0;
 			timetableElement.innerHTML = '';
 			dates.forEach((date) => {
 				const data = {
@@ -181,8 +181,19 @@ filterForm.date.setAttribute('value', workDate);
 				if (new Date(date).getDay() === 0) {
 					timetableElement.insertAdjacentHTML(
 						'beforeend',
-						`<div class="splitter"></div><article class="advertising">${rtb}</article>`
+						`<div class="splitter"></div><article class="advertising"><div id="yandex_rtb_R-A-1993172-1-${rtbPage}"></div></article>`
 					);
+					((pageNumber) => {
+						window.yaContextCb.push(() => {
+							// eslint-disable-next-line no-undef
+							Ya.Context.AdvManager.render({
+								blockId: 'R-A-1993172-1',
+								renderTo: `yandex_rtb_R-A-1993172-1-${pageNumber}`,
+								pageNumber
+							});
+						});
+					})(rtbPage);
+					rtbPage++;
 				}
 			});
 
