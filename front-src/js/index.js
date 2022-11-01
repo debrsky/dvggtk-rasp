@@ -60,7 +60,9 @@ const observer = new IntersectionObserver((entries, observer) => {
 
 const workDate = (() => {
 	const today = new Date();
-	return `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+	return `${today.getFullYear()}-${(today.getMonth() + 1)
+		.toString()
+		.padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
 })();
 
 filterForm.date.setAttribute('value', workDate);
